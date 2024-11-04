@@ -1,0 +1,30 @@
+# Exemple de fichier YAML pour tester le parseur
+name: ExampleProject
+version: 1.0
+description: "Un projet pour tester le parseur YAML"
+authors:
+  - Alice
+  - Bob
+  - Carol
+
+database:
+  type: postgres
+  host: localhost
+  port: 5432
+  credentials:
+    username: admin
+    password: secretpassword
+
+settings:
+  debug: true
+  logging:
+    level: info
+    file: /var/log/example.log
+
+dependencies:
+  - name: library1
+    version: "2.5.3"
+  - name: library2
+    version: "1.4.0"
+  - name: library3
+    version: "3.2.1"

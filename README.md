@@ -1,22 +1,23 @@
-# YAML Parser
+# Yamli
 
 ## Description
-Ce projet implémente un parseur simple pour YAML en Python. Le parseur valide la structure de base d'un fichier YAML, y compris les listes et les paires clé-valeur.
+Ce projet implémente un parseur simple pour le langage YAML en Python, géré par Poetry.
 
 ## Installation
 1. Cloner ce dépôt.
-2. Assurez-vous d’avoir Python 3 installé.
+2. Installer les dépendances avec Poetry :
+```bash
+poetry install
+```
 
 ## Exécution
-1. Placez un fichier YAML d'exemple dans le répertoire racine (par défaut `example.yaml`).
-2. Exécutez le parseur :
-    ```bash
-    python yaml_parser.py
-    ```
+Pour lancer le parseur sur un fichier YAML :
+```bash
+poetry run python yaml_parser/parser.py
+```
 
-## Structure
-- `yaml_parser.py` : Code du parseur.
-- `example.yaml` : Exemple de fichier YAML.
-
-## Explications Techniques
-Le parseur reconnaît les paires clé-valeur et les éléments de liste, en validant la syntaxe de base.
+## Tests
+Pour exécuter les tests unitaires :
+```bash
+poetry run pytest
+```

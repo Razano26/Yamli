@@ -14,7 +14,10 @@ st.markdown("Interprétez du YAML en direct et visualisez la structure des donn�
 default_yaml = """
 name: ExampleProject
 version: 1.0
-description: "Un projet pour tester le parseur YAML"
+description: |
+  Ceci est une description multi-lignes
+  du projet. Elle conserve les sauts de ligne
+  et la structure du texte.
 authors:
   - Alice
   - Bob
@@ -27,6 +30,11 @@ database:
   credentials:
     username: admin
     password: secretpassword
+
+notes: |
+  Ceci est une autre note multi-lignes.
+  Elle peut contenir plusieurs paragraphes et
+  des retours à la ligne.
 """
 
 # Barre latérale pour les actions et informations

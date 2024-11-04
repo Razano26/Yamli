@@ -20,10 +20,19 @@ class YAMLParser:
         parsed_data -- Structure de données analysée.
         """
         parsed_data = []
-        for line in lines:
-            parsed_line = self.parse_line(line)
-            if parsed_line is not None:
-                parsed_data.append(parsed_line)
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            if line.strip().endswith(": |"):  # Détection du début d'un bloc `|`
+                key = line.split(":")[0].strip()
+                literal_block, end_index = self.parse_literal_block(lines, i)
+                parsed_data.append(("literal_block", key, literal_block))
+                i = end_index  # Saute les lignes du bloc
+            else:
+                parsed_line = self.parse_line(line)
+                if parsed_line is not None:
+                    parsed_data.append(parsed_line)
+            i += 1
         return parsed_data
 
     def parse_line(self, line):
@@ -40,8 +49,6 @@ class YAMLParser:
         if not line or line.startswith("#"):  # Ignorer les lignes vides et commentaires
             return None
 
-        current_indent = len(line) - len(line.lstrip())
-
         if line.strip().startswith("- "):  # Cas d'un élément de liste
             item = line.strip()[2:]  # Supprimer "- "
             return ("list_item", item)
@@ -49,11 +56,30 @@ class YAMLParser:
         match = re.match(r"(\w+):\s*(.*)", line.strip())  # Correspondance clé-valeur
         if match:
             key, value = match.groups()
-            if not value:
-                value = None  # Accepter des valeurs vides
-            return ("key_value", key, value)
+            if value == "|":
+                return ("literal_block_start", key)
+            else:
+                return ("key_value", key, value)
 
         raise SyntaxError(f"Erreur de syntaxe YAML à la ligne: {line}")
+
+    def parse_literal_block(self, lines, start_index):
+        """Parse un bloc de texte YAML après un `|` et conserve les sauts de ligne et l'indentation."""
+        block = []
+        initial_indent = len(lines[start_index]) - len(lines[start_index].lstrip())
+
+        for i in range(start_index + 1, len(lines)):
+            line = lines[i]
+            current_indent = len(line) - len(line.lstrip())
+
+            if current_indent > initial_indent:
+                block.append(
+                    line.strip()
+                )  # Ajoute chaque ligne en respectant l'indentation
+            else:
+                return "\n".join(block), i - 1  # Fin du bloc multi-lignes
+
+        return "\n".join(block), i  # Retourne le bloc de texte et l'index de fin
 
     def validate_document(self, document):
         """
@@ -68,6 +94,9 @@ class YAMLParser:
                 print(f"Clé: {key}, Valeur: {value}")
             elif element[0] == "list_item":
                 print(f"Élément de liste: {element[1]}")
+            elif element[0] == "literal_block":
+                key, block = element[1], element[2]
+                print(f"Bloc texte ({key}):\n{block}\n")
 
 
 if __name__ == "__main__":

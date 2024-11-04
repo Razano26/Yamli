@@ -17,9 +17,12 @@ Voici la grammaire simplifiée utilisée par le parseur **Yamli** pour interpré
 <document> ::= <element> | <element> <document>
 <element> ::= <key_value> | <list>
 <key_value> ::= <key> ":" <value>
+<value> ::= <string> | <number> | "true" | "false" | "null" | <list> | <dictionary> | <literal_block>
+<literal_block> ::= "|" <newline> <indented_block>
+<indented_block> ::= <indented_line> | <indented_line> <newline> <indented_block>
+<indented_line> ::= <indent> <string>
 <list> ::= "-" <value>
 <key> ::= <string>
-<value> ::= <string> | <number> | "true" | "false" | "null" | <list> | <key_value>
 ```
 
 ### Explication de la Grammaire
@@ -33,17 +36,29 @@ Voici la grammaire simplifiée utilisée par le parseur **Yamli** pour interpré
 ### Exemples de Syntaxe Acceptée
 
 ```yaml
-name: ExampleProject       # Clé-valeur
-version: 1.0               # Clé-valeur avec un nombre
-authors:                   # Clé avec une liste imbriquée
+name: ExampleProject      # Clé-valeur
+version: 1.0              # Clé-valeur avec un nombre
+description: |            # Bloc de texte multi-lignes
+  Ceci est une description multi-lignes
+  du projet. Elle conserve les sauts de ligne
+  et la structure du texte.
+authors:                  # Clé avec une liste imbriquée
   - Alice
   - Bob
   - Carol
-database:                  # Clé avec un dictionnaire imbriqué
+
+database:                 # Clé avec un dictionnaire imbriqué
   type: postgres
+  host: localhost
+  port: 5432
   credentials:
     username: admin
-    password: secret
+    password: secretpassword
+
+notes: |
+  Ceci est une autre note multi-lignes.
+  Elle peut contenir plusieurs paragraphes et
+  des retours à la ligne.
 ```
 
 Cette grammaire permet au parseur de **Yamli** de reconnaître la plupart des structures YAML basiques tout en simplifiant l’analyse.

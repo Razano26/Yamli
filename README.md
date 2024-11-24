@@ -133,6 +133,20 @@ Pour exécuter les tests :
 poetry run pytest
 ```
 
+## Linter
+Le projet utilise pylint comme linter pour vérifier la conformité du code Python aux normes PEP 8.
+
+Pour exécuter le linter :
+
+```bash
+poetry run pylint yamli
+```
+
+## CI/CD
+Le projet est configuré pour utiliser GitHub Actions pour l'intégration continue (CI) et le déploiement continu (CD). Les workflows sont définis dans le dossier `.github/workflows`.
+
+Actuellement, le workflow CI vérifie le code Python avec `pytest` et `pylint` à chaque push ou pull request.
+
 ## Contribuer
 Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce projet, n’hésitez pas à ouvrir une pull request ou à signaler des problèmes.
 

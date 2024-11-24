@@ -1,4 +1,5 @@
 """ Un parseur simplifié pour analyser des fichiers YAML et valider leur structure. """
+
 import re
 
 

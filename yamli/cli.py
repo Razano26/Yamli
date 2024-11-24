@@ -1,7 +1,23 @@
 """ Module pour lancer le parsing YAML en CLI et l'application Streamlit. """
+
 import argparse
+import yaml  # Utilisé pour valider la syntaxe YAML
 import streamlit.web.cli as stcli
 from yamli.parser import YAMLParser
+
+
+def validate_yaml_file(file_path):
+    """Valide uniquement la syntaxe d'un fichier YAML."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            yaml.safe_load(file)  # Vérifie la syntaxe YAML
+        print(f"✅ Syntaxe valide : {file_path}")
+    except yaml.YAMLError as e:
+        print(
+            f"❌ Erreur de syntaxe YAML dans {file_path} :\n----------------\n{e}\n----------------"
+        )
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"❌ Erreur inattendue : {e}")
 
 
 def parse_yaml_file(file_path):
@@ -29,6 +45,12 @@ def main():
     parse_parser = subparsers.add_parser("parse", help="Parse un fichier YAML en CLI")
     parse_parser.add_argument("file", help="Chemin du fichier YAML à parser")
 
+    # Commande pour valider uniquement la syntaxe
+    validate_parser = subparsers.add_parser(
+        "validate", help="Valide uniquement la syntaxe d'un fichier YAML"
+    )
+    validate_parser.add_argument("file", help="Chemin du fichier YAML à valider")
+
     # Commande pour lancer Streamlit
     subparsers.add_parser("serve", help="Lancer l'application Streamlit")
 
@@ -36,6 +58,8 @@ def main():
 
     if args.command == "parse":
         parse_yaml_file(args.file)
+    elif args.command == "validate":
+        validate_yaml_file(args.file)
     elif args.command == "serve":
         serve()
 

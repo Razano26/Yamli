@@ -1,4 +1,5 @@
 """ Application principale pour le parsing YAML en direct avec Streamlit. """
+
 import io
 
 import streamlit as st

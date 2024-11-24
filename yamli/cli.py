@@ -28,7 +28,7 @@ def main():
     parse_parser.add_argument("file", help="Chemin du fichier YAML à parser")
 
     # Commande pour lancer Streamlit
-    serve_parser = subparsers.add_parser("serve", help="Lancer l'application Streamlit")
+    subparsers.add_parser("serve", help="Lancer l'application Streamlit")
 
     args = parser.parse_args()
 

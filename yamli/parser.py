@@ -7,7 +7,7 @@ class YAMLParser:
     """
 
     def __init__(self):
-        self.indentation_level = 0
+        self.stack = []  # Pile pour gérer les contextes imbriqués
 
     def parse_document(self, lines):
         """
@@ -25,9 +25,11 @@ class YAMLParser:
             line = lines[i]
             if line.strip().endswith(": |"):  # Détection du début d'un bloc `|`
                 key = line.split(":")[0].strip()
-                literal_block, end_index = self.parse_literal_block(lines, i)
+                self.stack.append(("literal_block_start", key))  # Empiler le contexte
+                literal_block, end_index = self.parse_literal_block(lines, i + 1)
+                self.stack.pop()  # Dépiler après traitement
                 parsed_data.append(("literal_block", key, literal_block))
-                i = end_index  # Saute les lignes du bloc
+                i = end_index  # Avancer à la fin du bloc
             else:
                 parsed_line = self.parse_line(line)
                 if parsed_line is not None:
@@ -57,29 +59,38 @@ class YAMLParser:
         if match:
             key, value = match.groups()
             if value == "|":
-                return ("literal_block_start", key)
+                return None  # La gestion du bloc littéral est séparée
             else:
                 return ("key_value", key, value)
 
         raise SyntaxError(f"Erreur de syntaxe YAML à la ligne: {line}")
 
     def parse_literal_block(self, lines, start_index):
-        """Parse un bloc de texte YAML après un `|` et conserve les sauts de ligne et l'indentation."""
-        block = []
-        initial_indent = len(lines[start_index]) - len(lines[start_index].lstrip())
+        """
+        Parse un bloc de texte YAML après un `|` et conserve les sauts de ligne et l'indentation.
 
-        for i in range(start_index + 1, len(lines)):
+        Arguments:
+        lines -- Liste des lignes du document YAML.
+        start_index -- Index de la première ligne après `|`.
+
+        Retourne:
+        tuple -- Texte du bloc et index de fin.
+        """
+        block = []
+        initial_indent = len(lines[start_index - 1]) - len(
+            lines[start_index - 1].lstrip()
+        )
+
+        for i in range(start_index, len(lines)):
             line = lines[i]
             current_indent = len(line) - len(line.lstrip())
 
-            if current_indent > initial_indent:
-                block.append(
-                    line.strip()
-                )  # Ajoute chaque ligne en respectant l'indentation
+            if current_indent > initial_indent or not line.strip():
+                block.append(line.strip())  # Ajouter chaque ligne du bloc
             else:
                 return "\n".join(block), i - 1  # Fin du bloc multi-lignes
 
-        return "\n".join(block), i  # Retourne le bloc de texte et l'index de fin
+        return "\n".join(block), len(lines) - 1
 
     def validate_document(self, document):
         """
@@ -100,9 +111,18 @@ class YAMLParser:
 
 
 if __name__ == "__main__":
-    with open("example.yaml", "r") as file:
-        lines = file.readlines()
+    import argparse
 
-    parser = YAMLParser()
-    document = parser.parse_document(lines)
-    parser.validate_document(document)
+    def parse_yaml_file(filepath):
+        with open(filepath, "r") as file:
+            lines = file.readlines()
+
+        parser = YAMLParser()
+        document = parser.parse_document(lines)
+        parser.validate_document(document)
+
+    parser = argparse.ArgumentParser(description="Parse a YAML file.")
+    parser.add_argument("file", help="Path to the YAML file to parse.")
+    args = parser.parse_args()
+
+    parse_yaml_file(args.file)

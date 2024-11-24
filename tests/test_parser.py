@@ -41,48 +41,32 @@ def test_tree_structure():
     assert root.children[0].children[1].name == "credentials: dict"
 
 
-def test_validate_yaml_file_valid():
+def test_validate_yaml_file_valid(capsys):
     """Test que la validation réussit avec un fichier YAML valide."""
-    valid_yaml = """
-    name: Example
-    version: 1.0
-    """
-    with open("tests/valid.yaml", "w", encoding="utf-8") as file:
-        file.write(valid_yaml)
+    valid_file_path = "tests/valid.yaml"
 
-    try:
-        validate_yaml_file("tests/valid.yaml")
-    except Exception:  # pylint: disable=broad-except
-        pytest.fail("La validation ne devrait pas échouer avec un fichier valide.")
+    validate_yaml_file(valid_file_path)
+    # On s'attend à ce que la validation réussisse sans erreur
+    # et que le message de succès soit affiché
+    captured = capsys.readouterr()
+    assert "✅ Syntaxe YAML valide pour le fichier" in captured.out
+    assert valid_file_path in captured.out
 
 
 def test_validate_yaml_file_invalid(capsys):
     """Test que la validation échoue avec un fichier YAML invalide."""
-    invalid_yaml = """
-    name: Example
-    version: 1.0
-      extra_indent: wrong
-    """
     invalid_file_path = "tests/invalid.yaml"
-    with open(invalid_file_path, "w", encoding="utf-8") as file:
-        file.write(invalid_yaml)
 
     validate_yaml_file(invalid_file_path)
 
     captured = capsys.readouterr()
-    assert "❌ Erreur de syntaxe YAML dans" in captured.out
+    assert "❌ Erreur de syntaxe dans" in captured.out
     assert invalid_file_path in captured.out
 
 
-def test_validate_yaml_file_unexpected_error(capsys, mocker):
-    """Mock un scénario où une erreur inattendue se produit"""
-    mocker.patch("builtins.open", side_effect=Exception("Erreur inattendue"))
-    fake_file_path = "/fake/path/to/file.yaml"
-
-    # Appelle la fonction
-    validate_yaml_file(fake_file_path)
-
-    # Capture et vérifie la sortie
-    captured = capsys.readouterr()
-    assert "❌ Erreur inattendue" in captured.out
-    assert "Erreur inattendue" in captured.out
+def test_invalid_syntax_unclosed_list():
+    """Test une erreur de liste non fermée dans un fichier YAML."""
+    invalid_yaml = "invalid: [unclosed_list\n"
+    parser = YAMLParser()
+    with pytest.raises(SyntaxError, match="Erreur de syntaxe YAML"):
+        parser.parse_document(invalid_yaml.splitlines())

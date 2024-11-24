@@ -1,5 +1,1 @@
-
-    name: Example
-    version: 1.0
-      extra_indent: wrong
-    
+invalid: [unclosed_list

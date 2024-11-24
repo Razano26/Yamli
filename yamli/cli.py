@@ -15,7 +15,7 @@ def validate_yaml_file(file_path):
         print(f"✅ Syntaxe YAML valide pour le fichier : {file_path}")
     except SyntaxError as e:
         print(f"❌ Erreur de syntaxe dans le fichier : {file_path}\n  {e}")
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print(f"❌ Une erreur inattendue s'est produite : {e}")
 
 

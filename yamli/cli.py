@@ -1,3 +1,4 @@
+""" Module pour lancer le parsing YAML en CLI et l'application Streamlit. """
 import argparse
 import streamlit.web.cli as stcli
 from yamli.parser import YAMLParser
@@ -5,7 +6,7 @@ from yamli.parser import YAMLParser
 
 def parse_yaml_file(file_path):
     """Parse un fichier YAML et affiche les résultats en CLI."""
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         lines = file.readlines()
     parser = YAMLParser()
     document = parser.parse_document(lines)
@@ -18,6 +19,7 @@ def serve():
 
 
 def main():
+    """Fonction principale pour le parsing en CLI et le serveur Streamlit."""
     parser = argparse.ArgumentParser(
         description="Parseur YAML CLI et serveur Streamlit"
     )

@@ -1,22 +1,28 @@
-from yamli.parser import YAMLParser
+""" Tests unitaires pour le module yamli.parser """
+
 import yaml
 from anytree import Node
+
 from yamli.app import build_tree
+from yamli.parser import YAMLParser
 
 
 def test_parse_key_value():
+    """ Teste la méthode de parsing pour une paire clé-valeur. """
     parser = YAMLParser()
     result = parser.parse_line("name: ExampleProject")
     assert result == ("key_value", "name", "ExampleProject")
 
 
 def test_parse_list_item():
+    """ Teste la méthode de parsing pour un élément de liste. """
     parser = YAMLParser()
     result = parser.parse_line("- item1")
     assert result == ("list_item", "item1")
 
 
 def test_invalid_yaml_syntax():
+    """ Teste une erreur de syntaxe YAML. """
     parser = YAMLParser()
     invalid_yaml = ["name: ExampleProject", "- item1", "invalid line"]
     try:

@@ -1,3 +1,4 @@
+""" Un parseur simplifié pour analyser des fichiers YAML et valider leur structure. """
 import re
 
 
@@ -60,8 +61,7 @@ class YAMLParser:
             key, value = match.groups()
             if value == "|":
                 return None  # La gestion du bloc littéral est séparée
-            else:
-                return ("key_value", key, value)
+            return ("key_value", key, value)
 
         raise SyntaxError(f"Erreur de syntaxe YAML à la ligne: {line}")
 
@@ -114,12 +114,13 @@ if __name__ == "__main__":
     import argparse
 
     def parse_yaml_file(filepath):
-        with open(filepath, "r") as file:
+        """ Parse un fichier YAML et affiche les résultats en CLI. """
+        with open(filepath, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        parser = YAMLParser()
-        document = parser.parse_document(lines)
-        parser.validate_document(document)
+        yaml_parser = YAMLParser()  # Renommer la variable pour éviter le conflit
+        document = yaml_parser.parse_document(lines)
+        yaml_parser.validate_document(document)
 
     parser = argparse.ArgumentParser(description="Parse a YAML file.")
     parser.add_argument("file", help="Path to the YAML file to parse.")

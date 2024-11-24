@@ -1,8 +1,11 @@
+""" Application principale pour le parsing YAML en direct avec Streamlit. """
+import io
+
 import streamlit as st
-from yamli.parser import YAMLParser
 import yaml  # Bibliothèque pour afficher la structure YAML en format JSON-like
 from anytree import Node, RenderTree  # Pour visualiser la structure en arbre
-import io
+
+from yamli.parser import YAMLParser
 
 # Configuration de la page
 st.set_page_config(page_title="YAML Live Parser", page_icon="📝", layout="wide")
@@ -11,7 +14,7 @@ st.title("📝 Live YAML Parser")
 st.markdown("Interprétez du YAML en direct et visualisez la structure des données.")
 
 # Texte YAML de démonstration par défaut
-default_yaml = """
+DEFAULT_YAML = """
 name: ExampleProject
 version: 1.0
 description: |
@@ -44,19 +47,19 @@ reset_button = st.sidebar.button("🔄 Réinitialiser le texte")
 show_example = st.sidebar.checkbox("Afficher un exemple de YAML", value=True)
 
 # Zone de texte principale avec option de réinitialisation
-yaml_input = st.text_area(
-    "Entrez votre YAML ici 👇", default_yaml if show_example else "", height=300
+YAML_INPUT = st.text_area(
+    "Entrez votre YAML ici 👇", DEFAULT_YAML if show_example else "", height=300
 )
 
 if reset_button:
-    yaml_input = default_yaml  # Réinitialise le texte à l'exemple par défaut
+    YAML_INPUT = DEFAULT_YAML  # Réinitialise le texte à l'exemple par défaut
 
 # Séparateur pour la sortie
 st.markdown("---")
 
-if yaml_input:
+if YAML_INPUT:
     # Divise le texte en lignes pour l'analyse
-    lines = yaml_input.splitlines()
+    lines = YAML_INPUT.splitlines()
 
     # Initialise le parseur et interprète les lignes de YAML
     parser = YAMLParser()
@@ -83,15 +86,15 @@ if yaml_input:
 
         # Créer un arbre racine et remplir la structure YAML
         root = Node("Root")
-        yaml_data = yaml.safe_load(yaml_input)  # Charger YAML comme structure Python
+        yaml_data = yaml.safe_load(YAML_INPUT)  # Charger YAML comme structure Python
         build_tree(root, yaml_data)
 
         # Affiche la structure de l'arbre
         st.subheader("🌳 Structure YAML en Arbre")
-        tree_text = "\n".join(
+        TREE_TEXT = "\n".join(
             [f"{pre}{node.name}" for pre, _, node in RenderTree(root)]
         )
-        st.text(tree_text)
+        st.text(TREE_TEXT)
 
         # Affichage formaté de la structure des données YAML
         st.subheader("🧾 Détails des Clés et Types")
@@ -116,7 +119,12 @@ if yaml_input:
 
     except yaml.YAMLError as e:
         st.error(f"❌ Erreur de syntaxe YAML : {e}")
-    except Exception as e:
-        st.error(f"❌ Erreur lors du parsing : {e}")
+    except ValueError as e:
+        st.error(f"❌ Erreur de valeur lors du parsing : {e}")
+    except TypeError as e:
+        st.error(f"❌ Erreur de type : {e}")
+    except Exception as e:  # pylint: disable=broad-except
+        st.error(f"❌ Erreur inattendue : {e}")
+
 else:
     st.info("Veuillez entrer du YAML pour voir les résultats.")

@@ -88,6 +88,10 @@ Cette grammaire permet au parseur de **Yamli** de reconnaître la plupart des st
 
 ```
 
+## Prérequis
+- (Python)[https://www.python.org/] 3.13 ou supérieur
+- (Poetry)[https://python-poetry.org/]
+
 ## Installation
 1. Clonez ce dépôt :
     ```bash

@@ -103,6 +103,12 @@ Pour analyser un fichier YAML en ligne de commande, utilisez la commande suivant
 poetry run yamli parse example.yaml
 ```
 
+Pour uniquement valider la syntaxe d'un fichier YAML, utilisez la commande suivante :
+
+```bash
+poetry run yamli validate example.yaml
+```
+
 ### 2. Lancer l'Interface Web avec Streamlit
 
 L'interface Streamlit permet une visualisation en temps réel. Pour lancer l'application :

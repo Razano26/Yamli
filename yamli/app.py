@@ -41,6 +41,22 @@ notes: |
   des retours à la ligne.
 """
 
+
+# Fonction de création d'arbre
+def build_tree(node, data):
+    """Construit un arbre à partir de données YAML imbriquées."""
+    if isinstance(data, dict):
+        for key, value in data.items():
+            child = Node(f"{key}: {type(value).__name__}", parent=node)
+            build_tree(child, value)
+    elif isinstance(data, list):
+        for i, item in enumerate(data):
+            child = Node(f"Item {i}: {type(item).__name__}", parent=node)
+            build_tree(child, item)
+    else:
+        Node(f"{data} ({type(data).__name__})", parent=node)
+
+
 # Barre latérale pour les actions et informations
 st.sidebar.title("Options")
 st.sidebar.markdown("Utilisez les options ci-dessous pour personnaliser l'entrée YAML.")
@@ -70,20 +86,6 @@ if YAML_INPUT:
         # Affiche les résultats du parsing
         st.subheader("📄 Résultats du Parsing")
         st.success("Parsing réussi !")
-
-        # Fonction de création d'arbre
-        def build_tree(node, data):
-            """Construit un arbre à partir de données YAML imbriquées."""
-            if isinstance(data, dict):
-                for key, value in data.items():
-                    child = Node(f"{key}: {type(value).__name__}", parent=node)
-                    build_tree(child, value)
-            elif isinstance(data, list):
-                for i, item in enumerate(data):
-                    child = Node(f"Item {i}: {type(item).__name__}", parent=node)
-                    build_tree(child, item)
-            else:
-                Node(f"{data} ({type(data).__name__})", parent=node)
 
         # Créer un arbre racine et remplir la structure YAML
         root = Node("Root")

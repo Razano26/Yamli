@@ -1,7 +1,6 @@
 """ Module pour lancer le parsing YAML en CLI et l'application Streamlit. """
 
 import argparse
-import yaml  # Utilisé pour valider la syntaxe YAML
 import streamlit.web.cli as stcli
 from yamli.parser import YAMLParser
 
@@ -10,14 +9,14 @@ def validate_yaml_file(file_path):
     """Valide uniquement la syntaxe d'un fichier YAML."""
     try:
         with open(file_path, "r", encoding="utf-8") as file:
-            yaml.safe_load(file)  # Vérifie la syntaxe YAML
-        print(f"✅ Syntaxe valide : {file_path}")
-    except yaml.YAMLError as e:
-        print(
-            f"❌ Erreur de syntaxe YAML dans {file_path} :\n----------------\n{e}\n----------------"
-        )
-    except Exception as e:  # pylint: disable=broad-except
-        print(f"❌ Erreur inattendue : {e}")
+            lines = file.readlines()
+        parser = YAMLParser()
+        parser.parse_document(lines)
+        print(f"✅ Syntaxe YAML valide pour le fichier : {file_path}")
+    except SyntaxError as e:
+        print(f"❌ Erreur de syntaxe dans le fichier : {file_path}\n  {e}")
+    except Exception as e:
+        print(f"❌ Une erreur inattendue s'est produite : {e}")
 
 
 def parse_yaml_file(file_path):

@@ -65,20 +65,27 @@ Cette grammaire permet au parseur de **Yamli** de reconnaître la plupart des st
 
 ## Organisation des Fichiers
 ```plaintext
-├── .gitignore               # Fichiers et dossiers ignorés par Git
-├── LICENSE                  # Licence MIT
-├── README.md                # Documentation du projet
-├── example.yaml             # Exemple de fichier YAML pour les tests
-├── poetry.lock              # Verrouillage des dépendances
-├── pyproject.toml           # Configuration Poetry
-├── tests                    # Dossier pour les tests unitaires
-│   ├── __init__.py
-│   └── test_parser.py       # Tests pour le parseur YAML et la structure en arbre
-└── yamli                    # Dossier principal du code source
-    ├── __init__.py
-    ├── app.py               # Interface Streamlit pour visualisation en temps réel
-    ├── cli.py               # Interface CLI pour exécuter le parseur et lancer Streamlit
-    └── parser.py            # Parseur YAML principal
+├── .github                    # Configuration des workflows GitHub Actions
+│   └── workflows
+│       └── main.yaml          # Définition du workflow CI/CD
+├── .gitignore                 # Liste des fichiers/dossiers à ignorer par Git
+├── .pylintrc                  # Configuration pour pylint
+├── LICENSE                    # Licence du projet (MIT)
+├── README.md                  # Documentation principale du projet
+├── example.yaml               # Exemple de fichier YAML pour tests ou démonstrations
+├── poetry.lock                # Verrouillage des dépendances
+├── pyproject.toml             # Configuration du projet et des dépendances via Poetry
+├── tests                      # Dossier contenant les tests unitaires
+│   ├── __init__.py            # Module Python pour le dossier tests
+│   ├── invalid.yaml           # Fichier YAML invalide pour les tests
+│   ├── test_parser.py         # Tests unitaires pour le parseur YAML
+│   └── valid.yaml             # Fichier YAML valide pour les tests
+└── yamli                      # Dossier principal contenant le code source
+    ├── __init__.py            # Fichier d'initialisation du module yamli
+    ├── app.py                 # Interface Streamlit pour visualisation et parsing interactif
+    ├── cli.py                 # Interface CLI pour utiliser le parseur et Streamlit
+    └── parser.py              # Parseur YAML principal
+
 ```
 
 ## Installation

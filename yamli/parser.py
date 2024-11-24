@@ -25,17 +25,21 @@ class YAMLParser:
         i = 0
         while i < len(lines):
             line = lines[i]
-            if line.strip().endswith(": |"):  # Détection du début d'un bloc `|`
-                key = line.split(":")[0].strip()
-                self.stack.append(("literal_block_start", key))  # Empiler le contexte
-                literal_block, end_index = self.parse_literal_block(lines, i + 1)
-                self.stack.pop()  # Dépiler après traitement
-                parsed_data.append(("literal_block", key, literal_block))
-                i = end_index  # Avancer à la fin du bloc
-            else:
-                parsed_line = self.parse_line(line)
-                if parsed_line is not None:
-                    parsed_data.append(parsed_line)
+            if not line.strip():  # Ignorer les lignes vides
+                i += 1
+                continue
+            try:
+                if line.strip().endswith(": |"):  # Détection du début d'un bloc littéral
+                    key = line.split(":")[0].strip()
+                    literal_block, end_index = self.parse_literal_block(lines, i + 1)
+                    parsed_data.append(("literal_block", key, literal_block))
+                    i = end_index  # Passer à la fin du bloc
+                else:
+                    parsed_line = self.parse_line(line)
+                    if parsed_line is not None:
+                        parsed_data.append(parsed_line)
+            except SyntaxError as e:
+                raise SyntaxError(f"Erreur de syntaxe YAML à la ligne {i + 1}: {line.strip()}") from e
             i += 1
         return parsed_data
 
@@ -55,20 +59,25 @@ class YAMLParser:
 
         if line.strip().startswith("- "):  # Cas d'un élément de liste
             item = line.strip()[2:]  # Supprimer "- "
+            if not item:  # Vérifier que l'élément de la liste est valide
+                raise SyntaxError("Élément de liste vide détecté")
             return ("list_item", item)
 
-        match = re.match(r"(\w+):\s*(.*)", line.strip())  # Correspondance clé-valeur
+        # Correspondance clé-valeur avec une validation stricte
+        match = re.match(r"^(\w+):\s*(.*)$", line.strip())
         if match:
             key, value = match.groups()
-            if value == "|":
-                return None  # La gestion du bloc littéral est séparée
+            # Validation des valeurs (par exemple, vérifier les listes non fermées)
+            if value.startswith("[") and not value.endswith("]"):
+                raise SyntaxError(f"Ligne invalide : {line}")
             return ("key_value", key, value)
 
-        raise SyntaxError(f"Erreur de syntaxe YAML à la ligne: {line}")
+        # Si aucune correspondance, lever une erreur de syntaxe
+        raise SyntaxError(f"Erreur de syntaxe détectée dans la ligne : {line}")
 
     def parse_literal_block(self, lines, start_index):
         """
-        Parse un bloc de texte YAML après un `|` et conserve les sauts de ligne et l'indentation.
+        Parse un bloc de texte YAML après un `|`.
 
         Arguments:
         lines -- Liste des lignes du document YAML.
@@ -78,18 +87,18 @@ class YAMLParser:
         tuple -- Texte du bloc et index de fin.
         """
         block = []
-        initial_indent = len(lines[start_index - 1]) - len(
-            lines[start_index - 1].lstrip()
-        )
+        initial_indent = len(lines[start_index - 1]) - len(lines[start_index - 1].lstrip())
 
         for i in range(start_index, len(lines)):
             line = lines[i]
             current_indent = len(line) - len(line.lstrip())
 
-            if current_indent > initial_indent or not line.strip():
-                block.append(line.strip())  # Ajouter chaque ligne du bloc
-            else:
-                return "\n".join(block), i - 1  # Fin du bloc multi-lignes
+            # Vérifier si l'indentation diminue (fin du bloc)
+            if current_indent <= initial_indent and line.strip():
+                return "\n".join(block), i - 1
+
+            # Ajouter les lignes correctement indentées au bloc
+            block.append(line.strip())
 
         return "\n".join(block), len(lines) - 1
 
